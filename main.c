@@ -51,11 +51,8 @@ int lamda_tester(void) {
     return 0;
 }
 
-int main(void) {
-    // try_catch_tester();
-    // printf("\n");
-    // lamda_tester();
-
+void oop_teste(void)
+{
     class(Person ,char *name;int age;);
     addMethod(Person, speak, void, (void *self, char *word) {
         Person *realself = self;
@@ -64,9 +61,13 @@ int main(void) {
 
     Person p1 = new(Person, "Jon", 42);
     method(Person, speak, p1, "Hello world!");
+}
 
-    // printf("Name: %s\n", p1.name);
-    // printf("Age: %d\n", p1.age);
-
+int main(void) {
+    try_catch_tester();
+    printf("\n");
+    lamda_tester();
+    printf("\n");
+    oop_teste();
     return 0;
 }
