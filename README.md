@@ -1,4 +1,4 @@
-# Functional Programming Concepts in C
+# OOP Concepts in C
 
 *test purpose only for fun.*
 
