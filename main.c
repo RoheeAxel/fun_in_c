@@ -53,7 +53,8 @@ int lamda_tester(void) {
 
 void oop_teste(void)
 {
-    class(Person ,char *name;int age;);
+    class(Entity, NULL, char *name;);
+    class(Person , Entity_, char *name;int age;);
     addMethod(Person, speak, void, (void *self, char *word) {
         Person *realself = self;
         printf("%s: %s", realself->name, word);

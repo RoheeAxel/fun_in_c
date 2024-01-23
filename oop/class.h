@@ -4,13 +4,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-char **__class_names__;
-int __class_names_count__;
+typedef struct methods_s {
+    char *name;
+    void (*__function__)(void *self, ...);
+} methods_t;
 
-//__method__ is an array of function pointers
-void (**__methods__)(void *, ...);
-char **__method_names__;
-int __methods_count__;
+typedef struct object_s {
+    char *name;
+    methods_t *__methods__;
+    size_t __methods_count__;
+} object_t;
+
+object_t *__objects__;
+size_t __objects_count__;
 
 char *n_strcat(char *dest, char *src) {
     char *result = malloc(sizeof(char) * (strlen(dest) + strlen(src) + 2));
@@ -19,24 +25,37 @@ char *n_strcat(char *dest, char *src) {
     strcat(result, src);
     return result;
 }
+
 #define class_struct(name, body) \
     typedef struct name##_t { \
         body \
         void (*__dtor__)(struct name *self); \
     } name;
 
-#define class(name, body) \
-    if (__class_names_count__ == 0) { \
-        __class_names__ = malloc(sizeof(char *)); \
-        __class_names__[0] = #name; \
-        __class_names_count__++; \
+#define class(class_name, super, body) \
+    if (__objects_count__ == 0) { \
+        __objects__ = malloc(sizeof(object_t)); \
+        __objects__[0].name = #class_name; \
+        __objects__[0].__methods_count__ = 0; \
+        __objects__[0].__methods__ = malloc(sizeof(methods_t)); \
+        __objects_count__++; \
     } else { \
-        __class_names__ = realloc(__class_names__, sizeof(char *) * (__class_names_count__ + 1)); \
-        __class_names__[__class_names_count__] = #name; \
-        __class_names_count__++; \
+        __objects__ = realloc(__objects__, sizeof(object_t) * (__objects_count__ + 1)); \
+        __objects__[__objects_count__].name = #class_name; \
+        __objects__[__objects_count__].__methods_count__ = 0; \
+        __objects__[__objects_count__].__methods__ = malloc(sizeof(methods_t)); \
+        __objects_count__++; \
     } \
-    class_struct(name, body) \
-    void __dtor__##name(name *self) { \
+    ({ \
+        char *super_str = #super; \
+        if (strcmp(super_str, "NULL") != 0) { \
+            printf("super Franky desu\n"); \
+        } else { \
+            printf("super NULL desu\n"); \
+        } \
+    }); \
+    class_struct(class_name, body) \
+    void __dtor__##class_name(class_name *self) { \
         free(self); \
     } \
 
@@ -44,32 +63,41 @@ char *n_strcat(char *dest, char *src) {
     ({ \
         return_type classname##_##method_name body; \
         classname##_##method_name; \
-        if (__methods_count__ == 0) { \
-            __methods__ = malloc(sizeof(void *)); \
-            __methods__[0] = classname##_##method_name; \
-            char *method_name_str = n_strcat(#classname, #method_name); \
-            __method_names__ = malloc(sizeof(char *)); \
-            __method_names__[0] = method_name_str; \
-            __methods_count__++; \
+        size_t index_object = 0; \
+        for (int i=0; i<__objects_count__; i++) { \
+            if (strcmp(__objects__[i].name, #classname) == 0) { \
+                index_object = i; \
+                break; \
+            } \
+        } \
+        if (__objects__[index_object].__methods_count__ == 0) { \
+            __objects__[index_object].__methods__ = malloc(sizeof(methods_t)); \
+            __objects__[index_object].__methods__[0].__function__ = classname##_##method_name; \
+            __objects__[index_object].__methods__[0].name = n_strcat(#classname, #method_name); \
+            __objects__[index_object].__methods_count__++; \
         } else { \
-            __methods__ = realloc(__methods__, sizeof(void *) * (__methods_count__ + 1)); \
-            __methods__[__methods_count__] = classname##_##method_name; \
-            char *method_name_str = n_strcat(#classname, #method_name); \
-            __method_names__ = realloc(__method_names__, sizeof(char *) * (__methods_count__ + 1)); \
-            __method_names__[__methods_count__] = method_name_str; \
-            __methods_count__++; \
+            __objects__[index_object].__methods__ = realloc(__objects__[index_object].__methods__, sizeof(methods_t) * (__objects__[index_object].__methods_count__ + 1)); \
+            __objects__[index_object].__methods__[__objects__[index_object].__methods_count__].__function__ = classname##_##method_name; \
+            __objects__[index_object].__methods__[__objects__[index_object].__methods_count__].name = n_strcat(#classname, #method_name); \
+            __objects__[index_object].__methods_count__++; \
         } \
     })
 
 #define method(classname, method_name, object, ...) \
     classname *ptr = &object; \
     void *cast_object = ptr; \
-    for (int i=0; i<__methods_count__; i++) { \
-        if (strcmp(__method_names__[i], n_strcat(#classname, #method_name)) == 0) { \
-            __methods__[i](cast_object, ##__VA_ARGS__); \
+    size_t index_object = 0; \
+    for (int i=0; i<__objects_count__; i++) { \
+        if (strcmp(__objects__[i].name, #classname) == 0) { \
+            index_object = i; \
+            break; \
+        } \
+    } \
+    for (int i=0; i<__objects__[index_object].__methods_count__; i++) { \
+        if (strcmp(__objects__[index_object].__methods__[i].name, n_strcat(#classname, #method_name)) == 0) { \
+            __objects__[index_object].__methods__[i].__function__(cast_object, ##__VA_ARGS__); \
         } \
     } \
 
 #define new(classname, ...) \
     {__VA_ARGS__, __dtor__##classname}
-
