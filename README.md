@@ -1,8 +1,8 @@
-# OOP Concepts in C
+# Some Concepts in C
 
 *test purpose only for fun.*
 
-This is some implementation of cpp feature in c to test 
+This is some implementation of cpp and python feature in c to test
 
 ## Concepts
 
@@ -18,3 +18,5 @@ Sort is a function that applies on array and sort this array with the lambda pas
 ```c
 sort(function, array)
 ```
+
+### Generator and yield
