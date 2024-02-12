@@ -14,6 +14,7 @@ HEADERS = $(wildcard *.h)
 HEADERS += $(wildcard error/*.h)
 HEADERS += $(wildcard function/*.h)
 HEADERS += $(wildcard oop/*.h)
+HEADERS += $(wildcard asyncio/*.h)
 
 # Object files
 OBJS = $(SRCS:.c=.o)
