@@ -39,3 +39,4 @@
 ({ \
 while (func(__VA_ARGS__)); \
 })
+

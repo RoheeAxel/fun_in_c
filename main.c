@@ -1,4 +1,6 @@
 #include "auto.h"
+#include "std__map.h"
+#include "vector.h"
 #include "function/lambda.h"
 #include "function/sort.h"
 #include <stdio.h>
@@ -116,6 +118,65 @@ void generator_tester(void)
             break;
         }
     }
+    printf("Done\n");
+}
+
+init_vector(int);
+void vector_tester(void)
+{
+    vector(int) *v = newT(vector, int, 0);
+    for (int i = 0; i < 10; i++) {
+        v->push_back(v, &i);
+    }
+    for (int i = 0; i < v->get_size(v); i++) {
+        printf("%d ", *(int *)v->at(v, i));
+    }
+
+    printf("\n");
+    deleteT(vector, int, v);
+}
+
+init_std__map(char, int);
+
+int char_cmp(char *a, char *b) {
+    return *(char *)a - *(char *)b;
+}
+
+void map_tester(void)
+{
+    std__map(char, int) *node = new_std__map(char, int)(char_cmp);
+
+    char *keys[10];
+    int *values[10];
+
+    for (int i = 0; i < 10; i++) {
+        char *k = malloc(sizeof(char));
+        int *v = malloc(sizeof(int));
+        *k = 65 + i;
+        *v = i * i;
+        node->insert(node, k, v);
+        keys[i] = k;
+        values[i] = v;
+    }
+
+    char *k = malloc(sizeof(char));
+    *k = 65+5;
+    int *v = node->get(node, k);
+    if (v == NULL) {
+        printf("Key not found\n");
+    } else {
+        printf("Node with key %c value: %d\n", *k, *v);
+    }
+    free(k);
+
+    delete_std__map(char, int)(node);
+
+    for (int i = 0; i < 10; i++) {
+        free(keys[i]);
+        free(values[i]);
+    }
+
+    return 0;
 }
 
 int main(void) {
@@ -124,6 +185,8 @@ int main(void) {
     // lamda_tester();
     // printf("\n");
     // oop_teste();
-    generator_tester();
+    // generator_tester();
+    vector_tester();
+    map_tester();
     return 0;
 }
